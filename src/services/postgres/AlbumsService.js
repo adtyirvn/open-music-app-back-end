@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
-const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
+const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 
 class AlbumsService {
@@ -18,6 +18,7 @@ class AlbumsService {
     if (!result.rows[0].id) {
       throw new InvariantError('Album gagal ditambahkan');
     }
+    return result.rows[0].id;
   }
 }
 
