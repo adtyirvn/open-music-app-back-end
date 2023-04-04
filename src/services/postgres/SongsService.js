@@ -3,7 +3,7 @@ const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const NotFoundError = require('../../exceptions/NotFoundError');
 const InvariantError = require('../../exceptions/InvariantError');
-const { mapDBSongsToModel } = require('../../utils');
+const { mapDBSongsToModel, mapDBSongToModel } = require('../../utils');
 
 class SongsService {
   constructor() {
@@ -42,13 +42,13 @@ class SongsService {
     if (!result.rows.length) {
       throw new NotFoundError('Catatan tidak ditemukan');
     }
-    return result.rows.map[0];
+    return result.rows.map(mapDBSongToModel);
   }
 
-  async editSongById(id, { title, year, genre, performer, duration, albumId }) {
+  async editSongById(id, { title, year, performer, genre, duration, albumId }) {
     const query = {
-      text: 'UPDATE songs SET title=$1, year=$2, genre=$3, performer=$4, duration=$5, album_id=$6 RETURNING id',
-      values: [id, title, year, genre, performer, duration, albumId],
+      text: 'UPDATE songs SET title=$1, year=$2, performer=$3, genre=$4, duration=$5, album_id=$6 WHERE id = $7 RETURNING id',
+      values: [title, year, performer, genre, duration, albumId, id],
     };
     const result = await this._pool.query(query);
     if (!result.rows.length) {
