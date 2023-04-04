@@ -2,6 +2,8 @@
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const InvariantError = require('../../exceptions/InvariantError');
+const { mapDBSongsToModel } = require('../../utils');
 
 class SongsService {
   constructor() {
@@ -10,11 +12,16 @@ class SongsService {
 
   async addSong({ title, year, genre, performer, duration, albumId }) {
     const id = nanoid(15);
+    console.log(id, title, year, genre, performer, duration, albumId);
+    // const id = nanoid(15);
     const query = {
-      text: 'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+      text: 'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
       values: [id, title, year, performer, genre, duration, albumId],
     };
     const result = await this._pool.query(query);
+    if (!result.rows[0].id) {
+      throw new InvariantError('Catatan gagal ditambahkan');
+    }
     return result.rows[0].id;
   }
 
@@ -22,17 +29,20 @@ class SongsService {
     const result = await this._pool.query({
       text: 'SELECT * FROM songs',
     });
-    return result.row;
+    return result.rows.map(mapDBSongsToModel);
   }
 
   async getSongById(id) {
-    const result = await this._pool.query({
-      text: 'SELECT * FROM songs WHERE id=$1 RETURNING id',
+    const query = {
+      text: 'SELECT * FROM songs WHERE id=$1',
       values: [id],
-    });
+    };
+    const result = await this._pool.query(query);
+
     if (!result.rows.length) {
-      throw new NotFoundError('Id song tidak ditemukan');
+      throw new NotFoundError('Catatan tidak ditemukan');
     }
+    return result.rows.map[0];
   }
 
   async editSongById(id, { title, year, genre, performer, duration, albumId }) {
