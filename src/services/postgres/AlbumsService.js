@@ -25,7 +25,6 @@ class AlbumsService {
 
   async getAlbums() {
     const result = await this._pool.query(`SELECT * FROM ${this._table}`);
-    // console.log(result);
     return result.rows;
   }
 
