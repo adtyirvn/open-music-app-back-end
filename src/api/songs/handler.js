@@ -19,7 +19,7 @@ class SongsHandler {
       duration = null,
       albumId = null,
     } = request.payload;
-    console.log(title, year, genre, performer, duration, albumId);
+    // console.log(title, year, genre, performer, duration, albumId);
     const songId = await this._service.addSong({
       title,
       year,
@@ -39,8 +39,10 @@ class SongsHandler {
     return response;
   }
 
-  async getSongsHandler() {
-    const songs = await this._service.getSongs();
+  async getSongsHandler(request) {
+    const { title, performer } = request.query;
+    // console.log(title);
+    const songs = await this._service.getSongs({ title, performer });
     return {
       status: 'success',
       data: {

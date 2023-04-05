@@ -3,19 +3,19 @@ const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const NotFoundError = require('../../exceptions/NotFoundError');
 const InvariantError = require('../../exceptions/InvariantError');
-const { mapDBSongsToModel, mapDBSongToModel } = require('../../utils');
+const { mapDBSongToModel } = require('../../utils');
 
 class SongsService {
   constructor() {
     this._pool = new Pool();
+    this._table = 'songs';
   }
 
   async addSong({ title, year, genre, performer, duration, albumId }) {
-    const id = nanoid(15);
-    console.log(id, title, year, genre, performer, duration, albumId);
-    // const id = nanoid(15);
+    const id = `song-${nanoid(15)}`;
+    // console.log(id, title, year, genre, performer, duration, albumId);
     const query = {
-      text: 'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+      text: `INSERT INTO ${this._table} VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
       values: [id, title, year, performer, genre, duration, albumId],
     };
     const result = await this._pool.query(query);
@@ -25,29 +25,49 @@ class SongsService {
     return result.rows[0].id;
   }
 
-  async getSongs() {
+  async getSongs({ title = null, performer = null }) {
+    if (title && performer) {
+      const query = `SELECT id, title, performer FROM ${this._table} WHERE title ILIKE $1`;
+      // console.log(title);
+      const result = await this._pool.query({
+        text: `${query} AND performer ILIKE $2`,
+        values: [`%${title}%`, `%${performer}%`],
+      });
+
+      return result.rows;
+    }
+    if (title || performer) {
+      const query = `SELECT id, title, performer FROM ${this._table} WHERE title ILIKE $1`;
+      // console.log(title);
+      const result = await this._pool.query({
+        text: `${query} OR performer ILIKE $2`,
+        values: [`%${title}%`, `%${performer}%`],
+      });
+
+      return result.rows;
+    }
     const result = await this._pool.query({
-      text: 'SELECT * FROM songs',
+      text: `SELECT id, title, performer FROM ${this._table}`,
     });
-    return result.rows.map(mapDBSongsToModel);
+    return result.rows;
   }
 
   async getSongById(id) {
     const query = {
-      text: 'SELECT * FROM songs WHERE id=$1',
+      text: `SELECT * FROM ${this._table} WHERE id=$1`,
       values: [id],
     };
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new NotFoundError('Catatan tidak ditemukan');
+      throw new NotFoundError('Song tidak ditemukan');
     }
-    return result.rows.map(mapDBSongToModel);
+    return result.rows.map(mapDBSongToModel)[0];
   }
 
   async editSongById(id, { title, year, performer, genre, duration, albumId }) {
     const query = {
-      text: 'UPDATE songs SET title=$1, year=$2, performer=$3, genre=$4, duration=$5, album_id=$6 WHERE id = $7 RETURNING id',
+      text: `UPDATE ${this._table} SET title=$1, year=$2, performer=$3, genre=$4, duration=$5, album_id=$6 WHERE id = $7 RETURNING id`,
       values: [title, year, performer, genre, duration, albumId, id],
     };
     const result = await this._pool.query(query);
