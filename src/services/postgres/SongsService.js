@@ -12,6 +12,7 @@ class SongsService {
   }
 
   async addSong({ title, year, genre, performer, duration, albumId }) {
+    await this.verifyAlbum(albumId);
     const id = `song-${nanoid(15)}`;
     const query = {
       text: `INSERT INTO ${this._table} VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
@@ -24,20 +25,32 @@ class SongsService {
     return result.rows[0].id;
   }
 
+  async verifyAlbum({ albumId }) {
+    const query = {
+      text: `SELECT id FROM ${this._table} WHERE id = $1`,
+      values: [albumId],
+    };
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new NotFoundError(
+        'Gagal menambahkan AlbumId. AlbumId tidak ditemukan'
+      );
+    }
+  }
+
   async getSongs({ title = null, performer = null }) {
+    const query = `SELECT id, title, performer FROM ${this._table}`;
     if (title && performer) {
-      const query = `SELECT id, title, performer FROM ${this._table} WHERE title ILIKE $1`;
       const result = await this._pool.query({
-        text: `${query} AND performer ILIKE $2`,
+        text: `${query} WHERE title ILIKE $1 AND performer ILIKE $2`,
         values: [`%${title}%`, `%${performer}%`],
       });
 
       return result.rows;
     }
     if (title || performer) {
-      const query = `SELECT id, title, performer FROM ${this._table} WHERE title ILIKE $1`;
       const result = await this._pool.query({
-        text: `${query} OR performer ILIKE $2`,
+        text: `${query} WHERE title ILIKE $1 OR performer ILIKE $2`,
         values: [`%${title}%`, `%${performer}%`],
       });
 
