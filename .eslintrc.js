@@ -12,6 +12,7 @@ module.exports = {
   plugins: ['prettier'],
   rules: {
     'no-console': 'off',
+    'no-underscore-dangle': 'off',
     'prettier/prettier': ['error', { singleQuote: true }],
   },
 };
