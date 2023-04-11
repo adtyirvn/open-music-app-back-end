@@ -25,9 +25,9 @@ class SongsService {
     return result.rows[0].id;
   }
 
-  async verifyAlbum({ albumId }) {
+  async verifyAlbum(albumId) {
     const query = {
-      text: `SELECT id FROM ${this._table} WHERE id = $1`,
+      text: 'SELECT id FROM albums WHERE id = $1',
       values: [albumId],
     };
     const result = await this._pool.query(query);

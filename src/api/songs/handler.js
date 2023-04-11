@@ -10,7 +10,6 @@ class SongsHandler {
 
   async postSongHandler(request, h) {
     this._validator.validateSongPayload(request.payload);
-
     const {
       title,
       year,
