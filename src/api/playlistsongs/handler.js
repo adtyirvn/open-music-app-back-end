@@ -29,5 +29,20 @@ class PlaylistSongHandler {
     response.code(201);
     return response;
   }
+
+  async deletePlaylistSongHandler(request, h) {
+    const { id: playlistId } = request.params;
+    const { id: credentialId } = request.auth.credentials;
+    await this._playlistService.verifyPlaylistOwner(playlistId, credentialId);
+    this._validator.validatePlaylistSongPayload(request.payload);
+    const { songId } = request.payload;
+    await this._playlistSongService.verifyPlaylistSong(songId);
+    await this._playlistSongService.deletePlaylistSong(songId, playlistId);
+    const response = h.response({
+      status: 'success',
+      message: 'Song berhasil dihapus pada Playlist',
+    });
+    return response;
+  }
 }
 module.exports = PlaylistSongHandler;

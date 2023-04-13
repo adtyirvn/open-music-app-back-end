@@ -21,6 +21,17 @@ class PlaylistSongService {
     return result.rows[0].id;
   }
 
+  async deletePlaylistSong(songId, playlistId) {
+    const query = {
+      text: 'DELETE FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2 RETURNING id',
+      values: [playlistId, songId],
+    };
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new InvariantError('Playlist Song gagal dihapus');
+    }
+  }
+
   async verifySong(songId) {
     const query = {
       text: 'SELECT id FROM songs WHERE id = $1',
@@ -30,6 +41,19 @@ class PlaylistSongService {
     if (!result.rows.length) {
       throw new NotFoundError(
         'Gagal menambahkan SongId. SongId tidak ditemukan'
+      );
+    }
+  }
+
+  async verifyPlaylistSong(songId, playlistId) {
+    const query = {
+      text: 'SELECT id FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2',
+      values: [playlistId, songId],
+    };
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new NotFoundError(
+        'Gagal menghapus SongId. SongId tidak ditemukan pada Playlist'
       );
     }
   }
