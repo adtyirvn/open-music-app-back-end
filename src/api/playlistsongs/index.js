@@ -6,10 +6,11 @@ module.exports = {
   version: '1.0.0',
   register: async (
     server,
-    { playlistSongService, playlistService, validator }
+    { usersService, playlistSongService, playlistService, validator }
   ) => {
     // initiate class handler as notesHandler object with service parameter for logic in handler
     const playlistSongHandler = new PlaylistSongHandler(
+      usersService,
       playlistSongService,
       playlistService,
       validator

@@ -11,7 +11,7 @@ class PlaylistService {
   }
 
   async addPlaylist({ name, owner }) {
-    const id = `play-${nanoid(16)}`;
+    const id = `playlist-${nanoid(16)}`;
     const query = {
       text: `INSERT INTO ${this._table} VALUES ($1, $2, $3) RETURNING id`,
       values: [id, name, owner],
@@ -23,9 +23,18 @@ class PlaylistService {
     return result.rows[0].id;
   }
 
+  async getPlaylistById(id) {
+    const query = {
+      text: `SELECT name FROM ${this._table} WHERE id = $1`,
+      values: [id],
+    };
+    const result = await this._pool.query(query);
+    return result.rows[0];
+  }
+
   async getPlaylists({ owner }) {
     const query = {
-      text: `SELECT * FROM ${this._table} WHERE owner = $1`,
+      text: `SELECT playlist.id, playlist.name, users.username FROM ${this._table} LEFT JOIN users ON users.id = playlist.owner WHERE playlist.owner = $1`,
       values: [owner],
     };
     const result = await this._pool.query(query);

@@ -18,7 +18,6 @@ class PlaylistSongService {
     if (!result.rows.length) {
       throw new InvariantError('Playlist Song gagal ditambahkan');
     }
-    return result.rows[0].id;
   }
 
   async deletePlaylistSong(songId, playlistId) {
@@ -30,6 +29,17 @@ class PlaylistSongService {
     if (!result.rows.length) {
       throw new InvariantError('Playlist Song gagal dihapus');
     }
+  }
+
+  async getPlaylistSong(playlistId) {
+    const query = {
+      text: `SELECT songs.id, songs.title, songs.performer FROM songs 
+      LEFT JOIN playlist_songs ON playlist_songs.song_id = songs.id 
+      WHERE playlist_songs.playlist_id = $1`,
+      values: [playlistId],
+    };
+    const result = await this._pool.query(query);
+    return result.rows;
   }
 
   async verifySong(songId) {
@@ -51,10 +61,8 @@ class PlaylistSongService {
       values: [playlistId, songId],
     };
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
-      throw new NotFoundError(
-        'Gagal menghapus SongId. SongId tidak ditemukan pada Playlist'
-      );
+    if (result.rows.length) {
+      throw new InvariantError('Song telah ditambahkan pada playlist');
     }
   }
 }

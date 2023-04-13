@@ -12,7 +12,7 @@ class SongsService {
   }
 
   async addSong({ title, year, genre, performer, duration, albumId }) {
-    await this.verifyAlbum(albumId);
+    // await this.verifyAlbum(albumId);
     const id = `song-${nanoid(15)}`;
     const query = {
       text: `INSERT INTO ${this._table} VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
