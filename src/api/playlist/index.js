@@ -2,7 +2,7 @@ const PlaylistHandler = require('./handler');
 const routes = require('./routes');
 
 module.exports = {
-  name: 'notes',
+  name: 'playlist',
   version: '1.0.0',
   register: async (server, { service, validator }) => {
     // initiate class handler as notesHandler object with service parameter for logic in handler
