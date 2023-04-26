@@ -19,7 +19,7 @@ class UsersService {
       values: [id, username, hashedPassword, fullname],
     };
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new InvariantError('User gagal ditambahkan');
     }
     return result.rows[0].id;
@@ -31,7 +31,7 @@ class UsersService {
       values: [username],
     };
     const result = await this._pool.query(query);
-    if (result.rows.length > 0) {
+    if (result.rowCount > 0) {
       throw new InvariantError(
         'Gagal menambahkan user. Username sudah digunakan'
       );
@@ -44,7 +44,7 @@ class UsersService {
       values: [username],
     };
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new AuthenticationsError('Kredensial yang Anda berikan salah');
     }
     const { id, password: hashedPassword } = result.rows[0];

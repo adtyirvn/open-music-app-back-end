@@ -15,7 +15,7 @@ class PlaylistSongService {
       values: [id, playlistId, songId],
     };
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new InvariantError('Playlist Song gagal ditambahkan');
     }
   }
@@ -26,7 +26,7 @@ class PlaylistSongService {
       values: [playlistId, songId],
     };
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new InvariantError('Playlist Song gagal dihapus');
     }
   }
@@ -48,7 +48,7 @@ class PlaylistSongService {
       values: [songId],
     };
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError(
         'Gagal menambahkan SongId. SongId tidak ditemukan'
       );
@@ -61,7 +61,7 @@ class PlaylistSongService {
       values: [playlistId, songId],
     };
     const result = await this._pool.query(query);
-    if (result.rows.length) {
+    if (result.rowCount) {
       throw new InvariantError('Song telah ditambahkan pada playlist');
     }
   }
