@@ -1,0 +1,10 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "prettier.singleQuote": true,
+  "prettier.jsxSingleQuote": true,
+  "eslint.codeActionsOnSave.rules": null,
+  "eslint.format.enable": false
+}
