@@ -38,6 +38,9 @@ const _exports = require('./api/exports');
 const ProducerService = require('./services/rabbitmq/ProducerService');
 const ExportsValidator = require('./validator/exports');
 
+const likes = require('./api/likes');
+const UserAlbumLikeService = require('./services/postgres/UserAlbumLikesService');
+
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
@@ -47,6 +50,7 @@ const init = async () => {
   const authenticationsService = new AuthenticationsService();
   const playlistService = new PlaylistService();
   const playlistSongService = new PlaylistSongService();
+  const userAlbumLikeService = new UserAlbumLikeService();
   const storageService = new StorageService(
     path.resolve(__dirname, 'api/uploads/file/images')
   );
@@ -143,6 +147,12 @@ const init = async () => {
         ProducerService,
         playlistService,
         validator: ExportsValidator,
+      },
+    },
+    {
+      plugin: likes,
+      options: {
+        service: userAlbumLikeService,
       },
     },
   ]);
