@@ -16,7 +16,6 @@ class ExportsHandler {
     this._validator.validateExportEmailPayload(request.payload);
     await this._playlistService.verifyPlaylistOwner(playlistId, credentialId);
     const message = {
-      userId: credentialId,
       playlistId,
       targetEmail,
     };
