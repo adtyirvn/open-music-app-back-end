@@ -6,6 +6,10 @@ const config = {
   rabbitMq: {
     server: process.env.RABBITMQ_SERVER,
   },
+  redis: {
+    host: process.env.REDIS_SERVER_HOST,
+    port: process.env.REDIS_SERVER_PORT,
+  },
 };
 
 module.exports = config;

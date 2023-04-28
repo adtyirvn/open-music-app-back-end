@@ -41,6 +41,8 @@ const ExportsValidator = require('./validator/exports');
 const likes = require('./api/likes');
 const UserAlbumLikeService = require('./services/postgres/UserAlbumLikesService');
 
+const CacheService = require('./services/redis/CacheService');
+
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
@@ -50,7 +52,8 @@ const init = async () => {
   const authenticationsService = new AuthenticationsService();
   const playlistService = new PlaylistService();
   const playlistSongService = new PlaylistSongService();
-  const userAlbumLikeService = new UserAlbumLikeService();
+  const cacheService = new CacheService();
+  const userAlbumLikeService = new UserAlbumLikeService(cacheService);
   const storageService = new StorageService(
     path.resolve(__dirname, 'api/uploads/file/images')
   );
