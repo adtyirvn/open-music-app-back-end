@@ -9,7 +9,6 @@ class ExportsHandler {
   }
 
   async postExportNotesHandler(request, h) {
-    console.log(request.payload);
     const { playlistId } = request.params;
     const { targetEmail } = request.payload;
     const { id: credentialId } = request.auth.credentials;
@@ -19,7 +18,6 @@ class ExportsHandler {
       playlistId,
       targetEmail,
     };
-    console.log(message);
     await this._ProducerService.sendMessage(
       'export:playlist',
       JSON.stringify(message)

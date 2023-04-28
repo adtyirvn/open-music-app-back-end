@@ -55,13 +55,24 @@ class UserAlbumLikesService {
     }
   }
 
+  async verifyAlbum(albumId) {
+    const queryAlbum = {
+      text: `SELECT id FROM albums WHERE id = $1`,
+      values: [albumId],
+    };
+    const resultAlbum = await this._pool.query(queryAlbum);
+    if (!resultAlbum.rowCount) {
+      throw new NotFoundError('Album tidak ditemukan');
+    }
+  }
+
   async verifyAlbumLike({ userId, albumId }) {
-    const query = {
+    const queryAlbumLike = {
       text: `SELECT id FROM ${this._table} WHERE user_id = $1 AND album_id = $2`,
       values: [userId, albumId],
     };
-    const result = await this._pool.query(query);
-    if (result.rowCount) {
+    const resultAlbumLike = await this._pool.query(queryAlbumLike);
+    if (resultAlbumLike.rowCount) {
       throw new InvariantError('Anda sudah menyukai album ini');
     }
   }

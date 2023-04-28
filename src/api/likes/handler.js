@@ -9,6 +9,7 @@ class LikesHandler {
   async postLikeHandler(request, h) {
     const { id: albumId } = request.params;
     const { id: userId } = request.auth.credentials;
+    await this._service.verifyAlbum(albumId);
     await this._service.verifyAlbumLike({
       userId,
       albumId,
@@ -31,7 +32,7 @@ class LikesHandler {
       albumId,
     });
     if ('redis' in like) {
-      const { likes } = like.likes;
+      const likes = parseInt(like.likes.likes, 10);
       const response = h.response({
         status: 'success',
         data: {
@@ -41,7 +42,7 @@ class LikesHandler {
       response.header('X-Data-Source', 'cache');
       return response;
     }
-    const { likes } = like;
+    const likes = parseInt(like.likes, 10);
     const response = h.response({
       status: 'success',
       data: {
